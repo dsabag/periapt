@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="card">
+        <div class="card-header">
+          <h1>Article Introduction</h1>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="form-group my-4">
+              <label for="article-name">Article Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="article-name"
+                aria-describedby="article-name"
+                placeholder="Enter Article Name"
+              />
+            </div>
+            <button type="submit" id="search-article" class="btn btn-primary">
+              Submit
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="container mt-5">
+      <div class="card">
+        <div class="card-header">
+          <h1>Sign Up</h1>
+        </div>
+        <div class="card-body">
+          <form>
+            <div class="form-group my-4">
+              <label for="username">User Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                aria-describedby="username"
+                placeholder="Enter User Name"
+              />
+            </div>
+            <select
+              id="lang-list"
+              class="form-select form-select-lg mb-3"
+              aria-label=".form-select-lg example"
+            >
+              <option value="" disabled selected>Select Language</option>
+            </select>
+            <br />
+            <button type="submit" id="submit-new-user" class="btn btn-primary">
+              Submit
+            </button>
+          </form>
+        </div>
+      </div>
+      <p class="mt-5 text-danger" id="error"></p>
+      <div id="content" class="content"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+      //html elements
+      const whitelistRegex = /^[a-zA-Z0-9-_]+$/;
+      const userName = document.getElementById("username");
+      const articleName = document.getElementById("article-name");
+      const language = document.getElementById("lang-list");
+      const errorField = document.getElementById("error");
+      const NewUserBtn = document.getElementById("submit-new-user");
+      const searchArticleBtn = document.getElementById("search-article");
+      const contentField = document.getElementById("content");
+
+      //create new user
+      NewUserBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (!validateUserInput(userName.value))
+          return (errorField.innerText =
+            "User Name Is Not Valid, Please Use Alphanumeric, Hyphens and Underscores Only");
+
+        errorField.innerText = "";
+
+        axios.post("/user", {
+          userName: userName.value,
+          language: language.value,
+        });
+      });
+
+      //new article search
+      searchArticleBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        if (!validateUserInput(articleName.value))
+          return (errorField.innerText =
+            "Article Name Is Not Valid, Please Use Alphanumeric, Hyphens and Underscores Only");
+
+        errorField.innerText = "";
+
+        const searchRes = await axios.get("/introduction/" + articleName.value);
+        contentField.innerHTML = "";
+        for (const key in searchRes.data) {
+          let element = document.createElement("p");
+          element.innerText = searchRes.data[key];
+          element.value = key;
+          contentField.appendChild(element);
+        }
+      });
+
+      //input characters validation
+      const validateUserInput = (userInput) => {
+        return whitelistRegex.test(userInput) ? true : false;
+      };
+
+      //languages
+      const languages = {
+        ab: "Abkhazian",
+        aa: "Afar",
+        af: "Afrikaans",
+        ak: "Akan",
+        sq: "Albanian",
+        am: "Amharic",
+        ar: "Arabic",
+        an: "Aragonese",
+        hy: "Armenian",
+        as: "Assamese",
+        av: "Avaric",
+        ae: "Avestan",
+        ay: "Aymara",
+        az: "Azerbaijani",
+        bm: "Bambara",
+        ba: "Bashkir",
+        eu: "Basque",
+        be: "Belarusian",
+        bn: "Bengali",
+        bh: "Bihari languages",
+        bi: "Bislama",
+        bs: "Bosnian",
+        br: "Breton",
+        bg: "Bulgarian",
+        my: "Burmese",
+        ca: "Catalan, Valencian",
+        km: "Central Khmer",
+        ch: "Chamorro",
+        ce: "Chechen",
+        ny: "Chichewa, Chewa, Nyanja",
+        zh: "Chinese",
+        cu: "Church Slavonic, Old Bulgarian, Old Church Slavonic",
+        cv: "Chuvash",
+        kw: "Cornish",
+        co: "Corsican",
+        cr: "Cree",
+        hr: "Croatian",
+        cs: "Czech",
+        da: "Danish",
+        dv: "Divehi, Dhivehi, Maldivian",
+        nl: "Dutch, Flemish",
+        dz: "Dzongkha",
+        en: "English",
+        eo: "Esperanto",
+        et: "Estonian",
+        ee: "Ewe",
+        fo: "Faroese",
+        fj: "Fijian",
+        fi: "Finnish",
+        fr: "French",
+        ff: "Fulah",
+        gd: "Gaelic, Scottish Gaelic",
+        gl: "Galician",
+        lg: "Ganda",
+        ka: "Georgian",
+        de: "German",
+        ki: "Gikuyu, Kikuyu",
+        el: "Greek (Modern)",
+        kl: "Greenlandic, Kalaallisut",
+        gn: "Guarani",
+        gu: "Gujarati",
+        ht: "Haitian, Haitian Creole",
+        ha: "Hausa",
+        he: "Hebrew",
+        hz: "Herero",
+        hi: "Hindi",
+        ho: "Hiri Motu",
+        hu: "Hungarian",
+        is: "Icelandic",
+        io: "Ido",
+        ig: "Igbo",
+        id: "Indonesian",
+        ia: "Interlingua (International Auxiliary Language Association)",
+        ie: "Interlingue",
+        iu: "Inuktitut",
+        ik: "Inupiaq",
+        ga: "Irish",
+        it: "Italian",
+        ja: "Japanese",
+        jv: "Javanese",
+        kn: "Kannada",
+        kr: "Kanuri",
+        ks: "Kashmiri",
+        kk: "Kazakh",
+        rw: "Kinyarwanda",
+        kv: "Komi",
+        kg: "Kongo",
+        ko: "Korean",
+        kj: "Kwanyama, Kuanyama",
+        ku: "Kurdish",
+        ky: "Kyrgyz",
+        lo: "Lao",
+        la: "Latin",
+        lv: "Latvian",
+        lb: "Letzeburgesch, Luxembourgish",
+        li: "Limburgish, Limburgan, Limburger",
+        ln: "Lingala",
+        lt: "Lithuanian",
+        lu: "Luba-Katanga",
+        mk: "Macedonian",
+        mg: "Malagasy",
+        ms: "Malay",
+        ml: "Malayalam",
+        mt: "Maltese",
+        gv: "Manx",
+        mi: "Maori",
+        mr: "Marathi",
+        mh: "Marshallese",
+        ro: "Moldovan, Moldavian, Romanian",
+        mn: "Mongolian",
+        na: "Nauru",
+        nv: "Navajo, Navaho",
+        nd: "Northern Ndebele",
+        ng: "Ndonga",
+        ne: "Nepali",
+        se: "Northern Sami",
+        no: "Norwegian",
+        nb: "Norwegian Bokmål",
+        nn: "Norwegian Nynorsk",
+        ii: "Nuosu, Sichuan Yi",
+        oc: "Occitan (post 1500)",
+        oj: "Ojibwa",
+        or: "Oriya",
+        om: "Oromo",
+        os: "Ossetian, Ossetic",
+        pi: "Pali",
+        pa: "Panjabi, Punjabi",
+        ps: "Pashto, Pushto",
+        fa: "Persian",
+        pl: "Polish",
+        pt: "Portuguese",
+        qu: "Quechua",
+        rm: "Romansh",
+        rn: "Rundi",
+        ru: "Russian",
+        sm: "Samoan",
+        sg: "Sango",
+        sa: "Sanskrit",
+        sc: "Sardinian",
+        sr: "Serbian",
+        sn: "Shona",
+        sd: "Sindhi",
+        si: "Sinhala, Sinhalese",
+        sk: "Slovak",
+        sl: "Slovenian",
+        so: "Somali",
+        st: "Sotho, Southern",
+        nr: "South Ndebele",
+        es: "Spanish, Castilian",
+        su: "Sundanese",
+        sw: "Swahili",
+        ss: "Swati",
+        sv: "Swedish",
+        tl: "Tagalog",
+        ty: "Tahitian",
+        tg: "Tajik",
+        ta: "Tamil",
+        tt: "Tatar",
+        te: "Telugu",
+        th: "Thai",
+        bo: "Tibetan",
+        ti: "Tigrinya",
+        to: "Tonga (Tonga Islands)",
+        ts: "Tsonga",
+        tn: "Tswana",
+        tr: "Turkish",
+        tk: "Turkmen",
+        tw: "Twi",
+        ug: "Uighur, Uyghur",
+        uk: "Ukrainian",
+        ur: "Urdu",
+        uz: "Uzbek",
+        ve: "Venda",
+        vi: "Vietnamese",
+        vo: "Volap_k",
+        wa: "Walloon",
+        cy: "Welsh",
+        fy: "Western Frisian",
+        wo: "Wolof",
+        xh: "Xhosa",
+        yi: "Yiddish",
+        yo: "Yoruba",
+        za: "Zhuang, Chuang",
+        zu: "Zulu",
+      };
+
+      let list = document.getElementById("lang-list");
+
+      //seed the list with languages
+      for (const key in languages) {
+        let element = document.createElement("option");
+        element.innerText = languages[key];
+        element.value = key;
+        list.appendChild(element);
+      }
+    </script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
